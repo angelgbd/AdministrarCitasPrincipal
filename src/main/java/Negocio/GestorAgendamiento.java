@@ -1,4 +1,4 @@
-package com.hospital.administracion.negocio;
+package Negocio;
 
 import DTOS.AgendamientoDTO;
 import Validaciones.ValidadorAgendamiento;
@@ -15,25 +15,25 @@ public class GestorAgendamiento implements IGestorAgendamiento {
 
     private final IAgendamientoDAO agendamientoDAO;
     private final ValidadorAgendamiento validador;
-    private final AgendamientoMapper mapper; // Nueva dependencia
+    private final AgendamientoMapper mapper; 
 
     public GestorAgendamiento() {
         this.agendamientoDAO = new AgendamientoDAO();
         this.validador = new ValidadorAgendamiento();
-        this.mapper = new AgendamientoMapper(); // Inicialización
+        this.mapper = new AgendamientoMapper(); 
     }
 
     @Override
     public void registrarNuevaCita(AgendamientoDTO dto) throws Exception {
-        // 1. Usamos el Mapper para obtener la entidad
+        // Se usa el mapper para obtener la entidad
         Cita cita = mapper.toEntity(dto);
 
-        // 2. Validaciones
+        // Se valida
         validador.validarDatosCita(cita);
         validador.validarFechaFutura(cita.getFechaHora());
         validador.validarHorarioLaboral(cita.getFechaHora());
 
-        // 3. Verificación de conflicto
+        // Se verifica el conflicto
         boolean ocupado = agendamientoDAO.existeCitaEnHorario(
                 dto.getIdDoctor(), 
                 dto.getFechaHora()
@@ -43,26 +43,26 @@ public class GestorAgendamiento implements IGestorAgendamiento {
             throw new IllegalStateException("El doctor seleccionado ya tiene una cita agendada en ese horario.");
         }
 
-        // 4. Configurar estado y guardar
+        // Se configura el estado y guardar
         cita.setEstado(EstadoCita.PROGRAMADA);
         agendamientoDAO.agendarCita(cita);
     }
 
     @Override
     public void reprogramarCita(AgendamientoDTO dto) throws Exception {
-        // Buscamos la cita original para asegurarnos que existe
+        // Se busca la cita original para verificar que existe
         Cita citaExistente = agendamientoDAO.buscarPorId(dto.getIdCita());
         if (citaExistente == null) {
             throw new IllegalArgumentException("La cita que intenta reprogramar no existe.");
         }
 
-        // Actualizamos solo la fecha en la entidad existente
+        // Se actualiza la fecha en la entidad
         citaExistente.setFechaHora(dto.getFechaHora());
 
-        // Validamos la nueva fecha
+        // Se valida la nueva fecha
         validador.validarFechaFutura(citaExistente.getFechaHora());
 
-        // Verificamos conflicto con la nueva hora
+        // Se verifica con la nueva hora
         boolean ocupado = agendamientoDAO.existeCitaEnHorario(
                 citaExistente.getDoctor().getId(), 
                 citaExistente.getFechaHora()
@@ -72,7 +72,7 @@ public class GestorAgendamiento implements IGestorAgendamiento {
             throw new IllegalStateException("El horario destino ya está ocupado.");
         }
         
-        // Reactivamos si estaba cancelada
+        // Se reactiva si estaba cancelada
         citaExistente.setEstado(EstadoCita.PROGRAMADA);
 
         agendamientoDAO.actualizarCita(citaExistente);
