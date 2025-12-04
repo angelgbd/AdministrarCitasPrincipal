@@ -1,1 +1,4 @@
-com\example\administrarcitas\AdministrarCitas.class
+DAOS\AgendamientoDAO.class
+Interfaces\IAgendamientoDAO.class
+DTOS\AgendamientoDTO.class
+Interfaces\IGestorAgendamiento.class

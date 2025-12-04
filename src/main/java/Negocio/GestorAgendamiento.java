@@ -1,82 +1,95 @@
-package Negocio;
+package com.hospital.administracion.negocio;
 
+import DTOS.AgendamientoDTO;
 import Validaciones.ValidadorAgendamiento;
 import DAOS.AgendamientoDAO;
 import Interfaces.IAgendamientoDAO;
 import Entidades.Cita;
+import Entidades.Doctor;
 import Entidades.EstadoCita;
+import Entidades.Paciente;
 import Interfaces.IGestorAgendamiento;
+import Negocio.AgendamientoMapper;
 
 public class GestorAgendamiento implements IGestorAgendamiento {
 
     private final IAgendamientoDAO agendamientoDAO;
     private final ValidadorAgendamiento validador;
+    private final AgendamientoMapper mapper; // Nueva dependencia
 
     public GestorAgendamiento() {
         this.agendamientoDAO = new AgendamientoDAO();
         this.validador = new ValidadorAgendamiento();
+        this.mapper = new AgendamientoMapper(); // Inicialización
     }
 
     @Override
-    public void registrarNuevaCita(Cita cita) throws Exception {
-        // 1. Validaciones básicas (Campos nulos, integridad)
-        validador.validarDatosCita(cita);
+    public void registrarNuevaCita(AgendamientoDTO dto) throws Exception {
+        // 1. Usamos el Mapper para obtener la entidad
+        Cita cita = mapper.toEntity(dto);
 
-        // 2. Validaciones de tiempo (No pasado, horario laboral)
+        // 2. Validaciones
+        validador.validarDatosCita(cita);
         validador.validarFechaFutura(cita.getFechaHora());
         validador.validarHorarioLaboral(cita.getFechaHora());
 
-        // 3. Validación de CONFLICTO (Regla crítica de negocio)
-        // ¿El doctor ya está ocupado a esa hora?
+        // 3. Verificación de conflicto
         boolean ocupado = agendamientoDAO.existeCitaEnHorario(
-                cita.getDoctor().getId(), 
-                cita.getFechaHora()
+                dto.getIdDoctor(), 
+                dto.getFechaHora()
         );
 
         if (ocupado) {
-            throw new IllegalStateException("El doctor seleccionado ya tiene una cita agendada en ese horario. Por favor seleccione otra hora.");
+            throw new IllegalStateException("El doctor seleccionado ya tiene una cita agendada en ese horario.");
         }
 
-        // 4. Configuración inicial
-        cita.setEstado(EstadoCita.PROGRAMADA); // Aseguramos estado inicial correcto
-
-        // 5. Persistencia
+        // 4. Configurar estado y guardar
+        cita.setEstado(EstadoCita.PROGRAMADA);
         agendamientoDAO.agendarCita(cita);
     }
 
     @Override
-    public void reprogramarCita(Cita cita) throws Exception {
-        // Validamos la nueva fecha
-        validador.validarDatosCita(cita);
-        validador.validarFechaFutura(cita.getFechaHora());
+    public void reprogramarCita(AgendamientoDTO dto) throws Exception {
+        // Buscamos la cita original para asegurarnos que existe
+        Cita citaExistente = agendamientoDAO.buscarPorId(dto.getIdCita());
+        if (citaExistente == null) {
+            throw new IllegalArgumentException("La cita que intenta reprogramar no existe.");
+        }
 
-        // Verificamos conflicto nuevamente (excepto con la misma cita si no cambió hora, 
-        // pero asumiremos que reprogramar implica cambio de hora)
+        // Actualizamos solo la fecha en la entidad existente
+        citaExistente.setFechaHora(dto.getFechaHora());
+
+        // Validamos la nueva fecha
+        validador.validarFechaFutura(citaExistente.getFechaHora());
+
+        // Verificamos conflicto con la nueva hora
         boolean ocupado = agendamientoDAO.existeCitaEnHorario(
-                cita.getDoctor().getId(), 
-                cita.getFechaHora()
+                citaExistente.getDoctor().getId(), 
+                citaExistente.getFechaHora()
         );
 
         if (ocupado) {
             throw new IllegalStateException("El horario destino ya está ocupado.");
         }
-
-        // Mantenemos estado o cambiamos a PROGRAMADA si estaba cancelada
-        cita.setEstado(EstadoCita.PROGRAMADA);
         
-        agendamientoDAO.actualizarCita(cita);
+        // Reactivamos si estaba cancelada
+        citaExistente.setEstado(EstadoCita.PROGRAMADA);
+
+        agendamientoDAO.actualizarCita(citaExistente);
     }
 
     @Override
-    public void cancelarCita(Cita cita) throws Exception {
-        if (cita == null || cita.getId() == null) {
+    public void cancelarCita(Long idCita) throws Exception {
+        if (idCita == null) {
+            throw new IllegalArgumentException("ID de cita inválido.");
+        }
+        
+        Cita cita = agendamientoDAO.buscarPorId(idCita);
+        if (cita == null) {
             throw new IllegalArgumentException("No se puede cancelar una cita inexistente.");
         }
         
-        // Simplemente cambiamos el estado
         cita.setEstado(EstadoCita.CANCELADA);
-        
-        // Usamos actualizar
         agendamientoDAO.actualizarCita(cita);
     }
 }
