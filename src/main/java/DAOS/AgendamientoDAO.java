@@ -1,4 +1,4 @@
-package com.hospital.administracion.persistencia;
+package DAOS;
 
 import Interfaces.IAgendamientoDAO;
 import Entidades.Cita;
