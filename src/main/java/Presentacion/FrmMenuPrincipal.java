@@ -15,6 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 public class FrmMenuPrincipal extends JFrame {
 
@@ -122,4 +124,18 @@ public class FrmMenuPrincipal extends JFrame {
     private void mostrarMensajeConstruccion() {
         JOptionPane.showMessageDialog(this, "Este módulo está en construcción.");
     }
+    
+      // MÉTODO MAIN 
+    public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            System.out.println("No se pudo cargar el diseño del sistema.");
+        }
+        
+        SwingUtilities.invokeLater(() -> {
+            new FrmMenuPrincipal().setVisible(true);
+        });
+    }
 }
+

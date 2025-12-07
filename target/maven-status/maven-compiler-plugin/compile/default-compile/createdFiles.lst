@@ -6,4 +6,5 @@ DTOS\AgendamientoDTO.class
 Interfaces\IGestorAgendamiento.class
 Negocio\GestorAgendamiento.class
 Validaciones\ValidadorAgendamiento.class
+Presentacion\FrmMenuPrincipal.class
 Negocio\AgendamientoMapper.class
