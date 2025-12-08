@@ -5,16 +5,33 @@
     <artifactId>AdministrarCitas</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <dependencies>
-    <dependency>
-    <groupId>com.example</groupId>
-    <artifactId>ConsultaReportes</artifactId>
-    <version>1.0-SNAPSHOT</version>
-</dependency>
-    </dependencies>
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>24</maven.compiler.release>
-        <exec.mainClass>com.example.administrarcitas.AdministrarCitas</exec.mainClass>
+        <maven.compiler.release>17</maven.compiler.release> <!-- Ajustado a 17 o 21 (LTS comunes) -->
+        <exec.mainClass>com.hospital.administracion.Main</exec.mainClass>
     </properties>
+
+    <dependencies>
+        <!-- 1. LIBRERÍA BASE (Entidades y Reportes) -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>ConsultaReportes</artifactId> 
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- 2. MÓDULO PACIENTES -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>GestionarPacientes</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        
+        <!-- 3. MÓDULO DOCTORES  -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>GestionarAgendaMedico</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>
