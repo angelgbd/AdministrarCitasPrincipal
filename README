@@ -1,0 +1,114 @@
+Sistema de Gestión Hospitalaria
+
+Sistema modular para la administración de un hospital, desarrollado en Java con arquitectura en capas y persistencia mediante Hibernate/JPA.
+
+Características Principales
+
+Arquitectura Modular: El sistema está dividido en proyectos independientes interconectados.
+
+Patrones de Diseño: Uso de DAO, DTO, Mapper, Facade (Gestores), Singleton y Strategy.
+
+Persistencia Robusta: Manejo de transacciones, integridad referencial y consultas JPQL optimizadas.
+
+Interfaz Gráfica: Desarrollada con Java Swing, enfocada en la usabilidad y validación de datos.
+
+Tecnologías
+
+Lenguaje: Java (JDK 17 o superior recomendado)
+
+Build Tool: Maven
+
+Base de Datos: MySQL 8.0
+
+ORM: Hibernate (Jakarta Persistence)
+
+GUI: Java Swing
+
+Arquitectura del Proyecto
+
+El sistema se compone de los siguientes módulos (Artifacts):
+
+ConsultarReportes (CORE): * Contiene las Entidades JPA (Doctor, Paciente, Cita).
+
+Contiene la configuración de persistencia (persistence.xml).
+
+Actúa como librería base para todos los demás módulos.
+
+GestionarPacientes: Módulo CRUD para registrar y buscar pacientes.
+
+GestionarDoctores (GestionarAgendaMedico): Módulo CRUD para el personal médico.
+
+AtencionMedica: Módulo para que los doctores registren diagnósticos y tratamientos.
+
+AdministrarCitas (MAIN): * Punto de entrada principal (Main).
+
+Contiene el Menú Principal y la gestión de Citas.
+
+Integra todos los módulos anteriores.
+
+Pre-requisitos
+
+Tener instalado Java JDK y NetBeans (o IntelliJ/Eclipse).
+
+Tener instalado MySQL Server.
+
+Crear la base de datos vacía:
+
+CREATE DATABASE ReporteConsultasHospital;
+
+
+Instalación y Ejecución
+
+Debido a la estructura modular, es CRÍTICO compilar e instalar los proyectos en el siguiente orden para que Maven resuelva las dependencias:
+
+Paso 1: Ve al proyecto ConsultarReportes y ejecuta:
+Click derecho -> Run Maven -> Install (o Clean and Build).
+Esto genera el .jar base.
+
+Paso 2: Instala los módulos satélites:
+
+Ve a GestionarPacientes -> Install.
+
+Ve a GestionarAgendaMedico (Doctores) -> Install.
+
+Ve a AtencionMedica -> Install.
+
+Paso 3: Ejecuta el proyecto principal:
+
+Ve a AdministrarCitas.
+
+Ejecuta Reload Project (para actualizar dependencias).
+
+Ejecuta el archivo Main.java o Clean and Build y luego Run.
+
+Casos de Uso Implementados
+
+1. Consultar Reportes
+
+Historial clínico de pacientes.
+
+Agenda diaria de doctores.
+
+2. Administrar Citas
+
+Agendar nuevas citas (Validación de horarios ocupados).
+
+Reprogramar o Cancelar citas.
+
+3. Gestión de Catálogos
+
+Pacientes: Registro, actualización y búsqueda por DNI.
+
+Doctores: Registro, actualización y búsqueda por Cédula.
+
+4. Atención Médica
+
+Registro de diagnóstico y receta (tratamiento).
+
+Finalización de citas.
+
+Autores
+
+Equipo de Desarrollo: Angel Gabriel Beltran Duarte
+
+Materia: Diseño y Arquitectura de Software
